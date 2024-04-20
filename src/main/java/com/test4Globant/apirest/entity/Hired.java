@@ -10,16 +10,16 @@ import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
+@Table(name ="hired")
+@Entity
 @NoArgsConstructor
 @Data
 @AllArgsConstructor
-@Table(name ="clients")
-@Entity
 @Builder
-public class employees {
+public class Hired {
 
     @Id
-    private int id;
+    private Long id;
     private String name;
     private Date datetime;
     private int department_id;

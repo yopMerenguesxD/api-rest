@@ -1,0 +1,50 @@
+1 Number of employees hired for each job and department in 2021 divided by quarter. The
+  table must be ordered alphabetically by department and job.
+
+SELECT
+    d.department AS Department,
+    j.job AS Job,
+    DATEPART(quarter, h.datetime) AS Quarter,
+    COUNT(h.id) AS Number_of_Employees_Hired
+FROM
+    hired h
+JOIN
+    jobs j ON h.id = j.id
+JOIN
+    departments d ON h.department_id = d.id
+WHERE
+    YEAR(h.datetime) = 2021
+GROUP BY
+    d.department, j.job, DATEPART(QUARTER, h.datetime)
+ORDER BY
+    d.department_nam, j.job, Quarter;
+
+
+2 List of ids, name and number of employees hired of each department that hired more employees than the mean of employees hired in 2021 for all the departments, ordered by the number of employees hired (descending).
+
+
+ WITH MeanEmployees AS (
+     SELECT AVG(num_employees) AS mean_employees
+     FROM (
+         SELECT COUNT(*) AS num_employees
+         FROM hired
+         WHERE EXTRACT(YEAR FROM datetime) = 2021
+         GROUP BY department_id
+     ) AS department_employees
+ ),
+ DepartmentHires AS (
+     SELECT department_id, COUNT(*) AS num_hires
+     FROM hired
+     WHERE EXTRACT(YEAR FROM datetime) = 2021
+     GROUP BY department_id
+ ),
+ DepartmentsAboveMean AS (
+     SELECT d.id AS department_id, d.department AS department_name, dh.num_hires
+     FROM DepartmentHires dh
+     JOIN departments d ON dh.department_id = d.id
+     CROSS JOIN MeanEmployees me
+     WHERE dh.num_hires > me.mean_employees
+ )
+ SELECT department_id, department_name, num_hires
+ FROM DepartmentsAboveMean
+ ORDER BY num_hires DESC;
